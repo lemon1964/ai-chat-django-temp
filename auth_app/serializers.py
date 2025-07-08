@@ -7,6 +7,7 @@ from django.utils.encoding import force_bytes
 from django.urls import reverse
 from django.core.mail import send_mail
 from django.contrib.auth.tokens import default_token_generator
+from dj_rest_auth.serializers import PasswordResetSerializer
 
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
@@ -80,3 +81,17 @@ class OAuthUserSerializer(serializers.Serializer):
         if value not in allowed_providers:
             raise serializers.ValidationError(f"Provider {value} is not supported.")
         return value
+    
+
+
+class CustomPasswordResetSerializer(PasswordResetSerializer):
+    def get_email_options(self):
+        request = self.context.get('request')
+        uid = self.context.get('uid', '')  # uid пользователя
+        token = self.context.get('token', '')
+        reset_url = f"{settings.FRONT_URL}/auth/password-reset/{uid}/{token}/"  # Ссылка для фронта
+
+        return {
+            "subject": "Password Reset",
+            "extra_email_context": {"reset_url": reset_url},
+        }
