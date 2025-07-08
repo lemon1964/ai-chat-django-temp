@@ -175,7 +175,7 @@ CORS_ALLOW_HEADERS = [
 
 REST_AUTH_REGISTER_SERIALIZERS = {
     "REGISTER_SERIALIZER": "ai-chat-django.auth_app.serializers.CustomRegisterSerializer",
-    # "OAUTH_REGISTER_SERIALIZER": "ai-chat-django.auth_app.serializers.OAuthUserSerializer",  # включим позже
+    "OAUTH_REGISTER_SERIALIZER": "ai-chat-django.auth_app.serializers.OAuthUserSerializer",
     "VERIFY_EMAIL": "path.to.CustomVerifyEmailView",
 }
 
