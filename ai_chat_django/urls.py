@@ -8,6 +8,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path("admin/", admin.site.urls),
     path('api/auth/', include('auth_app.urls')),  # Все аутентификационные пути в auth_app
+    path('api/chat/', include('chat_app.urls')),  # Все чат-пути в chat_app 
     path('accounts/', include('allauth.urls')),   # Системная почтовая верификация от allauth
     path('healthz/', lambda request: HttpResponse("Welcome to Django REST Module!")),   # проверка доступности
 ]

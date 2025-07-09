@@ -2,6 +2,7 @@
 from pathlib import Path
 from decouple import config, Csv
 from datetime import timedelta
+import cloudinary
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -47,6 +48,7 @@ INSTALLED_APPS = [
     'dj_rest_auth.registration',
     'corsheaders',
     'auth_app',
+    'chat_app',    
 ]
 
 AUTH_USER_MODEL = 'auth_app.User'
@@ -152,7 +154,8 @@ ACCOUNT_AUTHENTICATED_REDIRECT_URL = "/"  # Переадресация посл�
 REST_USE_JWT = True  # Используем JWT для аутентификации
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=10),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=600),
+    # 'ACCESS_TOKEN_LIFETIME': timedelta(minutes=10),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
@@ -182,3 +185,10 @@ REST_AUTH_REGISTER_SERIALIZERS = {
 DJANGO_SETTINGS_MODULE = {
     'PASSWORD_RESET_CONFIRM_URL': 'password-reset/{uid}/{token}/',
 }
+
+cloudinary.config(
+    cloud_name = config('CLOUDINARY_CLOUD_NAME'),
+    api_key = config('CLOUDINARY_API_KEY'),
+    api_secret = config('CLOUDINARY_API_SECRET'),
+    secure=True
+)

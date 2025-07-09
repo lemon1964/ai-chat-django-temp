@@ -18,22 +18,24 @@ User = get_user_model()
 
 class CustomRegisterSerializer(RegisterSerializer):
     name = serializers.CharField(required=True)
-    provider = serializers.CharField(required=False, default='credentials')
+    provider = serializers.CharField(required=False, default="credentials")
 
-    def save(self, request):    # переопределение метода save
-        user = super().save(request)    # сохраняем пользователя
-        user.name = self.validated_data['name']     # добавляем поле name
-        user.provider = self.validated_data.get('provider', 'credentials')  # добавляем поле provider
+    def save(self, request):  # переопределение метода save
+        user = super().save(request)  # сохраняем пользователя
+        user.name = self.validated_data["name"]  # добавляем поле name
+        user.provider = self.validated_data.get(
+            "provider", "credentials"
+        )  # добавляем поле provider
         user.is_active = False  # устанавливаем is_active в False
-        user.save()     # сохраняем изменения
+        user.save()  # сохраняем изменения
 
-        uid = urlsafe_base64_encode(force_bytes(user.pk))    # генерируем uid
-        token = default_token_generator.make_token(user)    # генерируем токен
+        uid = urlsafe_base64_encode(force_bytes(user.pk))  # генерируем uid
+        token = default_token_generator.make_token(user)  # генерируем токен
         confirmation_url = f"http://{settings.DOMAIN}{reverse('custom_verify_email')}?uid={uid}&token={token}"  # генерируем ссылку
 
         subject = "Email Confirmation"  # тема письма
-        message = fr"Подтвердите свой адрес электронной почты, перейдя по следующей ссылке: {confirmation_url}"
-        html_message = fr"""
+        message = rf"Подтвердите свой адрес электронной почты, перейдя по следующей ссылке: {confirmation_url}"
+        html_message = rf"""
         <html>
             <body>
                 <p>Подтвердите свой адрес электронной почты, перейдя по следующей ссылке:</p>
@@ -52,23 +54,20 @@ class CustomRegisterSerializer(RegisterSerializer):
 
         return user
 
-    
+
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
-    def get_token(cls, user):               # Добавляем поля в токен
-        token = super().get_token(user)     # Получаем токен
-        token['email'] = user.email
-        token['name'] = user.name
-        token['provider'] = user.provider
+    def get_token(cls, user):  # Добавляем поля в токен
+        token = super().get_token(user)  # Получаем токен
+        token["email"] = user.email
+        token["name"] = user.name
+        token["provider"] = user.provider
         return token
 
-    def validate(self, attrs):              # Проверяем email и пароль
-        credentials = {
-            'email': attrs.get('email'),
-            'password': attrs.get('password')
-        }
+    def validate(self, attrs):  # Проверяем email и пароль
+        credentials = {"email": attrs.get("email"), "password": attrs.get("password")}
         return super().validate(credentials)
-    
+
 
 class OAuthUserSerializer(serializers.Serializer):
     id = serializers.CharField(required=True)
@@ -77,18 +76,17 @@ class OAuthUserSerializer(serializers.Serializer):
     provider = serializers.CharField(required=True)
 
     def validate_provider(self, value):
-        allowed_providers = ['google', 'facebook', 'github']  # Разрешенные провайдеры
+        allowed_providers = ["google", "facebook", "github"]  # Разрешенные провайдеры
         if value not in allowed_providers:
             raise serializers.ValidationError(f"Provider {value} is not supported.")
         return value
-    
 
 
 class CustomPasswordResetSerializer(PasswordResetSerializer):
     def get_email_options(self):
-        request = self.context.get('request')
-        uid = self.context.get('uid', '')  # uid пользователя
-        token = self.context.get('token', '')
+        request = self.context.get("request")
+        uid = self.context.get("uid", "")  # uid пользователя
+        token = self.context.get("token", "")
         reset_url = f"{settings.FRONT_URL}/auth/password-reset/{uid}/{token}/"  # Ссылка для фронта
 
         return {
