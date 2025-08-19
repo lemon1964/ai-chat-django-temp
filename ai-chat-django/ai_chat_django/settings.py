@@ -1,7 +1,7 @@
+# ai-chat-django/ai_chat_django/settings.py
 from pathlib import Path
 from decouple import config, Csv
 from datetime import timedelta
-import cloudinary
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -22,8 +22,10 @@ else:
     CORS_ALLOWED_ORIGINS = config("CORS_ALLOWED_ORIGINS", cast=Csv())
     CSRF_COOKIE_SECURE = True
     CSRF_COOKIE_HTTPONLY = True
-    FRONT_URL = "https://ai-chat-frontend-5abc.onrender.com"
-    DOMAIN = "ai-chat-backend-7abc.onrender.com"
+    # позже заменим на prod
+    FRONT_URL = "http://localhost:3000"
+    DOMAIN = "localhost:8000"
+
 
 INSTALLED_APPS = [
     "django.contrib.sites",
@@ -46,8 +48,9 @@ INSTALLED_APPS = [
     "dj_rest_auth.registration",
     "corsheaders",
     "auth_app",
-    'chat_app',
 ]
+
+AUTH_USER_MODEL = 'auth_app.User'
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -173,19 +176,10 @@ CORS_ALLOW_HEADERS = [
 
 REST_AUTH_REGISTER_SERIALIZERS = {
     "REGISTER_SERIALIZER": "ai-chat-django.auth_app.serializers.CustomRegisterSerializer",
-    "OAUTH_REGISTER_SERIALIZER": "ai-chat-django.auth_app.serializers.OAuthUserSerializer",
+    "OAUTH_REGISTER_SERIALIZER": "ai-chat-django.auth_app.serializers.OAuthUserSerializer",  # включим позже
     "VERIFY_EMAIL": "path.to.CustomVerifyEmailView",
 }
 
 DJANGO_SETTINGS_MODULE = {
     "PASSWORD_RESET_CONFIRM_URL": "password-reset/{uid}/{token}/",
 }
-
-AUTH_USER_MODEL = 'auth_app.User'
-
-cloudinary.config(
-    cloud_name = config('CLOUDINARY_CLOUD_NAME'),
-    api_key = config('CLOUDINARY_API_KEY'),
-    api_secret = config('CLOUDINARY_API_SECRET'),
-    secure=True
-)

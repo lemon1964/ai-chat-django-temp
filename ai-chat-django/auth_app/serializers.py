@@ -66,8 +66,8 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             'password': attrs.get('password')
         }
         return super().validate(credentials)
-    
-    
+
+
 class OAuthUserSerializer(serializers.Serializer):
     id = serializers.CharField(required=True)
     email = serializers.EmailField(required=True)
@@ -79,8 +79,8 @@ class OAuthUserSerializer(serializers.Serializer):
         if value not in allowed_providers:
             raise serializers.ValidationError(f"Provider {value} is not supported.")
         return value
-    
-    
+
+
 class CustomPasswordResetSerializer(PasswordResetSerializer):
     def get_email_options(self):
         request = self.context.get('request')
