@@ -2,6 +2,7 @@
 from pathlib import Path
 from decouple import config, Csv
 from datetime import timedelta
+import cloudinary
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -48,6 +49,7 @@ INSTALLED_APPS = [
     "dj_rest_auth.registration",
     "corsheaders",
     "auth_app",
+    'chat_app',    
 ]
 
 AUTH_USER_MODEL = 'auth_app.User'
@@ -183,3 +185,10 @@ REST_AUTH_REGISTER_SERIALIZERS = {
 DJANGO_SETTINGS_MODULE = {
     "PASSWORD_RESET_CONFIRM_URL": "password-reset/{uid}/{token}/",
 }
+
+cloudinary.config(
+    cloud_name = config('CLOUDINARY_CLOUD_NAME'),
+    api_key = config('CLOUDINARY_API_KEY'),
+    api_secret = config('CLOUDINARY_API_SECRET'),
+    secure=True
+)
