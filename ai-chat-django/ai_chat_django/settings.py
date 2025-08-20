@@ -23,10 +23,8 @@ else:
     CORS_ALLOWED_ORIGINS = config("CORS_ALLOWED_ORIGINS", cast=Csv())
     CSRF_COOKIE_SECURE = True
     CSRF_COOKIE_HTTPONLY = True
-    # позже заменим на prod
-    FRONT_URL = "http://localhost:3000"
-    DOMAIN = "localhost:8000"
-
+    FRONT_URL = "https://ai-chat-frontend-5abc.onrender.com"
+    DOMAIN = "ai-chat-backend-7abc.onrender.com"
 
 INSTALLED_APPS = [
     "django.contrib.sites",
