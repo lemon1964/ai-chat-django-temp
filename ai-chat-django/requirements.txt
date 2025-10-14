@@ -21,3 +21,6 @@ together==0.2.10
 cloudinary==1.44.0
 django-cloudinary-storage==0.3.0
 gunicorn==23.0.0
+yookassa==3.6.0
+pytest==8.4.2
+pytest-django==4.11.1

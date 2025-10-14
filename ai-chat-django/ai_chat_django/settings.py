@@ -1,3 +1,4 @@
+# ai-chat-django/ai_chat_django/settings.py
 from pathlib import Path
 from decouple import config, Csv
 from datetime import timedelta
@@ -10,7 +11,15 @@ DJANGO_ENV = config('DJANGO_ENV', default='local')
 
 if DJANGO_ENV == 'local':
     DEBUG = config('DEBUG', default=True, cast=bool)
-    ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+    ALLOWED_HOSTS = [
+        "127.0.0.1",  # Локальный хост для тестов
+        "localhost",  # Чтобы поддерживать локальный доступ через localhost
+        "xxx.serveo.net",  # URL serveo
+    ]
+    CSRF_TRUSTED_ORIGINS = [
+        "http://localhost:3000",
+        "https://xxx.serveo.net",
+    ]
     CORS_ALLOW_ALL_ORIGINS = True
     CSRF_COOKIE_SECURE = False
     CSRF_COOKIE_HTTPONLY = False
@@ -47,7 +56,8 @@ INSTALLED_APPS = [
     'dj_rest_auth.registration',
     'corsheaders',
     'auth_app',
-    'chat_app',    
+    'chat_app',
+    'payment',    
 ]
 
 MIDDLEWARE = [
@@ -148,8 +158,7 @@ ACCOUNT_AUTHENTICATED_REDIRECT_URL = "/"  # Переадресация посл�
 REST_USE_JWT = True  # Используем JWT для аутентификации
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=1000),
-    # 'ACCESS_TOKEN_LIFETIME': timedelta(minutes=10),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=10),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
@@ -178,3 +187,47 @@ cloudinary.config(
     api_secret = config('CLOUDINARY_API_SECRET'),
     secure=True
 )
+
+# Настройки для ЮKassa
+SHOP_ID = config("SHOP_ID")
+KASSA_SECRET_KEY = config("KASSA_SECRET_KEY")
+
+try:
+    from yookassa import Configuration
+    Configuration.configure(SHOP_ID, KASSA_SECRET_KEY)
+except ImportError:
+    print("Yookassa not installed")
+except Exception as e:
+    print(f"Error configuring Yookassa: {e}")
+
+CRON_SECRET = config("CRON_SECRET", default="")
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "{levelname} {asctime} {module} {process:d} {thread:d} {message}",
+            "style": "{",
+        },
+        "simple": {
+            "format": "{levelname} {asctime} {message}",
+            "style": "{",
+        },
+    },
+    "handlers": {
+        "console": {
+            "level": "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": "simple",
+        },
+    },
+    "loggers": {
+        "django": {"handlers": ["console"], "level": "INFO",},
+        "django.request": {"handlers": ["console"], "level": "WARNING"},
+        "rest_framework.authentication": {"handlers": ["console"], "level": "INFO"},
+        "payment": {"handlers": ["console"], "level": "INFO"},
+        "auth_app": {"handlers": ["console"], "level": "INFO"},
+        "mermind": {"handlers": ["console"], "level": "INFO"},
+    },
+}
