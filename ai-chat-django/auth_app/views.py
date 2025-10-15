@@ -4,6 +4,7 @@ from .serializers import CustomRegisterSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.utils.http import urlsafe_base64_decode
+from django.utils.timezone import now
 from django.contrib.auth.tokens import default_token_generator
 from django.shortcuts import redirect
 from allauth.account.models import EmailAddress
@@ -19,10 +20,17 @@ from dj_rest_auth.views import PasswordResetView
 from .serializers import CustomPasswordResetSerializer
 from rest_framework_simplejwt.tokens import BlacklistedToken, TokenError
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly
 from ai_chat_django import settings
+from payment.models import Subscription
+
+import logging
+logger = logging.getLogger("auth_app")
 
 User = get_user_model()
+
+FREE = {"text": 1, "code": 1, "image": 1, "diagram": 1}
+PREMIUM = {"text": 3, "code": 3, "image": 1, "diagram": 3}
 
 class CustomRegisterView(RegisterView):
     serializer_class = CustomRegisterSerializer
@@ -271,3 +279,25 @@ def update_quantity(request):
     user.quantity += quantity_to_add    # Обновляем количество вопросов
     user.save(update_fields=["quantity"])
     return Response({"message": "Количество вопросов обновлено", "total_quantity": user.quantity})
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticatedOrReadOnly])
+def me_flags(request):
+    user = request.user if request.user.is_authenticated else None
+
+    is_premium = False
+    if user:
+        is_premium = Subscription.objects.filter(
+            user=user, status="active", next_charge_at__gt=now()
+        ).exists()
+
+    limits = PREMIUM if is_premium else (FREE if user else {"text":0,"code":0,"image":0,"diagram":0})
+    logger.info("me_flags user=%s premium=%s limits=%s",
+                getattr(user, "id", None), is_premium, limits)
+    return Response({
+        "is_authenticated": bool(user),
+        "is_premium": is_premium,
+        "tier": ("premium" if is_premium else ("free" if user else "guest")),
+        "limits": limits,
+    })

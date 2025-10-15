@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     'auth_app',
     'chat_app',
     'payment',    
+    "mermind",    
 ]
 
 MIDDLEWARE = [

@@ -11,6 +11,7 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),   # Системная почтовая верификация от allauth
     path('api/chat/', include('chat_app.urls')),  # Все чат-пути в chat_app 
     path("api/payment/", include("payment.urls")),  # API для платежного сервиса    
+    path("api/mermaid/", include("mermind.urls")),  # API для Mermaid
     path('healthz/', lambda request: HttpResponse("Welcome to Django REST Module!")),   # проверка доступности
 ]
 

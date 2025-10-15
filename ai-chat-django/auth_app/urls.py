@@ -13,6 +13,7 @@ from .views import (
     get_user_data,
     update_name,
     update_quantity,
+    me_flags,
 )
 
 urlpatterns = [
@@ -22,7 +23,6 @@ urlpatterns = [
     path('custom/login/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),  # Вход
 
     path('custom/oauth/register-or-login/', CustomOAuthRegisterOrLoginView.as_view(), name='oauth_register_or_login'),  # OAuth Google NextAuth
-    # Стандартные JWT/авторизационные пути
     
     # Сброс пароля
     path('password/reset/', CustomPasswordResetView.as_view(), name='password_reset'),
@@ -35,10 +35,12 @@ urlpatterns = [
     # Удаление по id или email
     path('delete-user/', DeleteUserView.as_view(), name='delete_user_by_email_or_id'),
     
+    # Стандартные JWT/авторизационные пути
     path('', include('dj_rest_auth.urls')),  # самый последний в блоке авторизации
     
     # API пользователя    
     path('get-user-data/', get_user_data, name='get-user-data'),        # Данные о пользователе 
     path('update-name/', update_name, name='update-name'),              # Обновление имени
     path('update-quantity/', update_quantity, name='update-quantity'),  # Количество вопросов
+    path("me/flags/", me_flags, name="me-flags"),                       # Флаги    
 ]
