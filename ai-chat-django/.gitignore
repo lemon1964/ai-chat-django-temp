@@ -1,0 +1,12 @@
+# ai-chat-django/.gitignore
+__pycache__/
+.pytest_cache/
+*.pyc
+*.log
+*.env
+*.DS_Store
+.venv/
+venv/
+.idea/
+.vscode/
+/static/
